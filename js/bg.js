@@ -207,6 +207,13 @@ var notificationId, token, user;
 chrome.storage.sync.get("user", function (res) {
     if(res.user) {
         user = res.user;
+        currentTrack = {
+            title: "",
+            album: "",
+            artist: "",
+            photoSrc: "",
+            rawName: ""
+        };
     }
 });
 
@@ -318,6 +325,7 @@ chrome.runtime.onMessage.addListener(function(req, sender) {
         var anythingFound = false;
         var obvious_separators = [' - ', ' – ', '-'];
         var separators = ['-', '–', ':', '~'];
+        currentTrack = currentTrack || {};
         currentTrack.rawName = stripName(req.rawName);
         currentTrack.url = sender.url;
         if(cache.check(sender.url)) {
