@@ -1,0 +1,275 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Getting Started Extension's Popup</title>
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <style>
+        body {
+            font-size: 12px;
+            min-width: 357px;
+            overflow-x: hidden;
+            margin: 0;
+            font-family: sans-serif;
+        }
+        table {
+            border-collapse: collapse;
+            width:100%;
+        }
+        #content {
+            padding: 0px 10px;
+        }
+        #cover-photo {
+            width: 128px;
+        }
+        #cover-img {
+            height:128px;
+            width: 128px;
+        }
+        #description {
+            padding-left: 10px;
+            line-height: 1.5;
+        }
+        header {
+            padding: 10px;
+            margin-bottom: 20px;
+            background-image: linear-gradient(#e31b23, #b32024);
+            color: #FFF;
+        }
+        footer {
+            vertical-align: middle;
+            text-align: center;
+            margin-top: 20px;
+        }
+        footer table {
+            vertical-align: middle;
+            height: 40px;
+        }
+        footer td {
+            width: 33%;
+            padding-top: 7px;
+            border: solid #DDD 1px;
+            border-bottom: none;
+        }
+        footer td:first-child {
+            border-left: none;
+        }
+        footer td:last-child {
+            border-right: none;
+        }
+        footer span {
+            position:relative;
+            top:-7px;
+            margin-left: 5px;
+        }
+        input[type=checkbox] {
+            appearance: none;
+            -webkit-appearance: none;
+            box-shadow: inset 0px 0px 0px 1px #e6e6e6;
+            border-radius: 15px;
+            background-color: #fff;
+            padding: 1px;
+            display: inline-block;
+            width: 43px;
+            height: 22px;
+            position: relative;
+            cursor: pointer;
+            transition: all .3s ease-out;
+            margin: 0px;
+            transform: scale(1);
+            -webkit-transform: scale(1); /* Adjust size here */
+        }
+        input[type=checkbox]:checked {
+            box-shadow: inset 0px 0px 0px 20px #e31b23;
+        }
+        input[type=checkbox]:after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 15px;
+            box-shadow: 0px 2px 2px 1px rgba(0,0,0,.2);
+            cursor: pointer;
+            background-color: #fff;
+            transition: all 0.1s ease-in .1s;
+        }
+        input[type="checkbox"]:checked:after {
+            left: 22px;
+        }
+        input:focus {
+            outline:none;
+        }
+        button:focus {
+            outline:none;
+        }
+        #smartTagContainer {
+            font-size: 12px;
+            text-align: right;
+            display: none;
+            background-color: #F4F4F4;
+        }
+        #smartTagContainer table {
+            text-align: left;
+            width:100%;
+            background-color: #F4F4F4;
+        }
+        #smartTagContainer td {
+            padding-top: 5px;
+            padding-bottom: 5px;
+            padding-left: 5px;
+            border-bottom: 1px solid #C4C4C4;
+        }
+        #smartTagButton {
+            cursor: pointer;
+            transition: 1s ease-in-out background;
+        }
+        .titles {
+            width: 50px;
+            border-right: 1px solid #888;
+            font-weight: 800;
+        }
+        .red {
+            background: linear-gradient(#e31b23, #cb1d24); height: 20px;
+            color: #FFF;
+        }
+        .spacer {
+            height: 20px;
+            background: linear-gradient(#cb1d24, #b32024); height: 20px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 6px 12px;
+            margin-right: 5px;
+            margin-bottom: 2px;
+            font-weight: normal;
+            line-height: 1.35;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            cursor: pointer;
+            -webkit-user-select: none;
+             -moz-user-select: none;
+              -ms-user-select: none;
+                  user-select: none;
+            background-image: none;
+            border: 1px solid #AAA;
+            border-radius: 4px;
+                    color: #333;
+            background-color: #fff;
+            border-color: #ccc;
+        }
+        .selected-suggestion {
+            background-color: #cb1d24;
+            color: #FFF;
+        }
+        .selected-suggestion:hover {
+            background-color: #cb1d24;
+        }
+        .suggestion:hover {
+            background-color: #eb6065;
+        }
+        .edit {
+            font-size: 13px;
+        }
+        .fa-interactive {
+            color: #888;
+        }
+        .fa-interactive:hover {
+            color: #000;
+        }
+        .fa {
+            cursor: pointer;
+        }
+        input[type=textbox],
+        input[type=password] {
+            font-size: 12px;
+            display: block;
+            width: 98%;
+            padding: 4px 0px;
+            padding-left:4px;
+            color: #555;
+            background-color: #fff;
+            background-image: none;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .confirm-btn {
+            margin-top:4px;
+            font-size: 12px;
+            background-image: linear-gradient(#e31b23, #b32024);
+            color: #FFF;
+        }
+    </style>
+    <meta charset="utf-8" >
+    <!--
+      - JavaScript and HTML must be in separate files: see our Content Security
+      - Policy documentation[1] for details and explanation.
+      -
+      - [1]: http://developer.chrome.com/extensions/contentSecurityPolicy.html
+     -->
+    <script src="js/jquery-2.1.1.min.js"></script>
+    <script src="js/popup.js"></script>
+  </head>
+  <body>
+    <header>
+    </header>
+    <div id="content">
+        <table>
+            <tbody>
+                <tr>
+                    <td rowspan="3" id="cover-photo">
+                        <img src="img/notAvailable.png" id="cover-img">
+                    </td>
+                    <td id="description">
+                        <span id="artist"></span><br/>
+                        <b><span id="title"></span></b><br/>
+                        <i><span id="album"></span></i><br/>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <footer>
+        <table>
+            <tr>
+                <td style="padding: 0;" id="smartTagButton"><b>SmartTag</b></td>
+                <td><input type="checkbox" id="scrobbleCheckbox"/><span>Scrobble</span></td>
+                <td><input type="checkbox" id="notificationsCheckbox"/><span>Notify</span></td>
+            </tr>
+        </table>
+    </footer>
+      
+    <div id="smartTagContainer">
+        <table>
+            <tr class="spacer"><td colspan="2"></td></tr>
+            <tr>
+                <td class="titles">Artist</td>
+                <td id="artist-suggestions">
+                    <span class="btn suggestion as">Alt-J</span>
+                    <span class="btn suggestion as">Bloodflood</span>
+                    <span class="btn suggestion as">Everything You'll Ever Need</span>
+                    <span class="editArtist"><span class="fa-stack fa-lg">
+                      <i class="fa fa-circle fa-stack-2x fa-interactive"></i>
+                      <i class="fa fa-pencil fa-stack-1x fa-inverse"></i>
+                    </span></span>
+                </td>
+            </tr>
+            <tr>
+                <td class="titles">Title</td>
+                <td id="title-suggestions">
+                    <span class="btn suggestion ts">Alt-J</span>
+                    <span class="btn suggestion ts">Bloodflood</span>
+                    <span class="btn suggestion ts">Everything You'll Ever Need</span>
+                    <span class="editTitle"><span class="fa-stack fa-lg">
+                      <i class="fa fa-circle fa-stack-2x fa-interactive"></i>
+                      <i class="fa fa-pencil fa-stack-1x fa-inverse"></i>
+                    </span></span>
+                </td>
+            </tr>
+        </table>
+        <button class="btn confirm-btn" id="confirm">Confirm</button>
+    </div>
+    <script src="js/events.js"></script>
+  </body>
+
+</html>
+
