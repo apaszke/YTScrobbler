@@ -1,1 +1,2 @@
 #Youtube Scrobbler
+YTS is the most intuitive of all the scrobblers available for the chrome browser. The SmartTag feature automatically generates suggestions so you hardly ever have to type anything on your own. Correcting track tags has never been so quick and easy.
