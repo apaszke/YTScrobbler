@@ -52,9 +52,17 @@ $('#smartTagButton').click(function() {
         });
         function unique(list) {
             var result = [];
-            $.each(list, function(i, e) {
-                if ($.inArray(e, result) == -1) result.push(e);
-            });
+            for(var i = 0; i < list.length; i++) {
+                var elem = list[i];
+                var unique = true;
+                for(var ii = i+i; ii < list.length; ii++) {
+                    if (list[ii] == elem) {
+                        unique = false;
+                        break;
+                    }
+                }
+                if(unique) result.push(elem);
+            }
             return result;
         }
         tmp = rawName.match(/\(.*?remix\)/ig);
