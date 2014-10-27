@@ -1,8 +1,8 @@
 var LastFmManager = function () {
-    this.API_KEY = "486587e92b3bd2e9c3217787ca7d1ce2";
-    var API_KEY = "486587e92b3bd2e9c3217787ca7d1ce2";
+    this.API_KEY = "";
+    var API_KEY = "";
     var API_ROOT_URL = "http://ws.audioscrobbler.com/2.0/";
-    var API_SECRET = "5cc62dbf9d00966ed8535b988c77167d";
+    var API_SECRET = "";
     
     
     this.generateSignature = function(arguments) {
