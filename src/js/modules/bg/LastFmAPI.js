@@ -12,8 +12,8 @@ var LastFmAPI = function (settings) {
     
     /**
      * Generates signature
-     * @param   {[[Type]]} params [[Description]]
-     * @returns {[[Type]]} [[Description]]
+     * @param   {Object} params Query parameters
+     * @returns {String} Query signature
      */
     this.generateSignature = function generateSignature(params) {
         // Get all keys from parameters
@@ -26,7 +26,7 @@ var LastFmAPI = function (settings) {
             if(a < b) return -1;
             if(a > b) return 1;
             return 0;
-        }
+        };
         names = names.sort(compare);
         // Serialize parameters
         var serialized = names.reduce(function(prev, curr) {
@@ -34,7 +34,7 @@ var LastFmAPI = function (settings) {
         }, "");
         // Hash result
         return CryptoJS.MD5(serialized+API_SECRET).toString();
-    }
+    };
     
     /*
      * AUTHENTICATION MODULE
@@ -43,26 +43,27 @@ var LastFmAPI = function (settings) {
         var result = {};
         // Temporary token storage
         var token;
+        
         /**
          * Retrieve login token
          * @param {Function} callback Callback function
          */
-        result.getToken = function(callback) {
+        result.getToken = function getToken(callback) {
             $.get(API_ROOT_URL,
                 { method: "auth.getToken", api_key: API_KEY, format: "json"},
                 function(data) {
                     token = data.token;
                     if(callback) callback(undefined, data.token);
                 });
-        }
+        };
         /**
          * Check if token has been confirmed, retrieve session and save it in Settings
          * @param {Function} callback Callback function
          */
-        result.getSession = function(callback) {
+        result.getSession = function getSession(callback) {
             var params = {method: "auth.getSession",
                           api_key: API_KEY,
-                          token: token }
+                          token: token };
             var signature = parent.generateSignature(params);
             $.get(API_ROOT_URL,
                   $.extend(params, {api_sig: signature, format: "json"}),
@@ -74,82 +75,137 @@ var LastFmAPI = function (settings) {
                         callback(data.error);
                       }
                   });
-        }
+        };
         
         return result;
     })(this);
     
+    /*
+     * SCROBBLE MODULE
+     */
     this.scrobble = (function (parent) {
         var result = {};
-        result.send = function(artist, title, album) {
-            chrome.storage.sync.get("user", function(data) {
-                var date = Math.floor(Date.now() / 1000);
-                var args = [{name: "method",    value: "track.scrobble"},
-                            {name: "api_key",   value: API_KEY},
-                            {name: "sk",        value: data.user.session.key},
-                            {name: "artist",    value: artist},
-                            {name: "track",     value: title},
-                            {name: "timestamp", value: date}];
-                if (album) args.push[{name: "album", value: album}];
-                var signature = parent.generateSignature(args);
-                $.post(API_ROOT_URL,
-                       parent.argListToObj(args, signature),
-                       function(data) {
-                           console.log(data);
-                       });
-            });
-        }
-        result.updateNowPlaying = function(artist, title, album) {
-            chrome.storage.sync.get("user", function(data) {
-                var args = [{name: "method",    value: "track.updateNowPlaying"},
-                            {name: "api_key",   value: API_KEY},
-                            {name: "sk",        value: data.user.session.key},
-                            {name: "artist",    value: artist},
-                            {name: "track",     value: title}];
-                if (album) args.push[{name: "album", value: album}];
-                var signature = parent.generateSignature(args);
-                $.post(API_ROOT_URL,
-                       parent.argListToObj(args, signature),
-                       function(data) {
-                           console.log(data);
-                       });
-            });
-        }
+        /**
+         * Scrobble track
+         * @param {String}   artist   Artist name
+         * @param {String}   title    Title
+         * @param {String}   album    (Optional) Album name
+         * @param {Function} callback Callback function
+         */
+        result.send = function sendScrobble(artist, title, album, callback) {
+            // Generate parameter object
+            var date = Math.floor(Date.now() / 1000);
+            var params = {method: "track.scrobble",
+                          api_key: API_KEY,
+                          sk: settings.getSessionKey(),
+                          artist: artist,
+                          track: title,
+                          timestamp: date};
+            if (album) params.album = album;
+            //Append signature
+            params.api_sig = parent.generateSignature(params);
+            // Change format
+            params.format = "json";
+            // Send request
+            $.post(API_ROOT_URL,
+                   params,
+                   function(data) {
+                       if(callback) {
+                           if(data.error) {
+                               callback(data.error);
+                           } else {
+                               callback(undefined, data['@attr']);
+                           }
+                       }
+                   });
+        };
+        
+        /**
+         * Update Now Playing song
+         * @param {String}   artist   Artist name
+         * @param {Title}    title    Track title
+         * @param {Album}    album    (Optional) Album
+         * @param {Function} callback Callback function
+         */
+        result.updateNowPlaying = function updateNowPlaying(artist, title, album, callback) {
+            // Generate parameter object
+            var params = {method: "track.updateNowPlaying",
+                          api_key: API_KEY,
+                          sk: settings.getSessionKey(),
+                          artist: artist,
+                          track: title};
+            if (album) params.album = album;
+            // Append signature
+            params.api_sig = parent.generateSignature(params);
+            // Change format
+            params.format = "json";
+            // Send request
+            $.post(API_ROOT_URL,
+                   params,
+                   function(data) {
+                       if(callback) {
+                           if(data.error) {
+                               callback(data.error);
+                           } else {
+                               callback(undefined, data.nowplaying);
+                           }
+                       }
+                   });
+        };
+        
         return result;
     })(this);
     
+    /*
+     * TRACK INFO MODULE
+     */
     this.track = (function (parent) {
         var result = {};
-        result.getInfo = function (artist, track, callback) {
+        result.getInfo = function getTrackInfo(artist, title, callback) {
             $.get(API_ROOT_URL,
                   {method: "track.getInfo",
                    api_key: API_KEY,
                    artist: artist,
-                   track: track,
+                   track: title,
                    format: "json"},
                   function(data) {
-                      callback(undefined, data.track);
-                  });
-        }
+                       if(callback) {
+                           if(data.error) {
+                               callback(data.error);
+                           } else {
+                               callback(undefined, data.track);
+                           }
+                       }
+                   });
+        };
         return result;
     })(this);
     
+    /*
+     * ARTIST INFO MODULE
+     */
     this.artist = (function (parent) {
         var result = {};
-        result.getInfo = function (artist, callback) {
+        result.getInfo = function getArtistInfo(artist, callback) {
             $.get(API_ROOT_URL,
                   {method: "artist.getInfo",
                    api_key: API_KEY,
                    artist: artist,
                    format: "json"},
                   function(data) {
-                      callback(undefined, data.artist);
-                  });
-        }
+                       if(callback) {
+                           if(data.error) {
+                               callback(data.error);
+                           } else {
+                               callback(undefined, data.artist);
+                           }
+                       }
+                   });
+        };
         return result;
     })(this);
     
     return this;
-}
+};
 
 module.exports = LastFmAPI;

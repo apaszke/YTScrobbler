@@ -1,8 +1,25 @@
 var LastFmAPI = require('./modules/bg/LastFmAPI.js');
 var Settings = require('./modules/bg/Settings.js');
+var YouTubeParser = require('./sites/youtube.js');
+var $ = require('./lib/jquery-2.1.1.min.js');
 
 window.settings = new Settings();
-window.API = new LastFmAPI(window.settings);
+window.helpers = {
+    youtube: new YouTubeParser($)
+};
+settings.init(function() {
+    window.API = new LastFmAPI(window.settings);
+});
+
+chrome.tabs.onUpdated.addListener(function(id, info, state) {
+    if(state.status == 'complete' && state.url.indexOf('youtube') > -1) {
+        helpers.youtube.getInfoForUrl(state.url, function(err, info) {
+            console.log(info);
+        });
+    }
+});
+
+/* http://gdata.youtube.com/feeds/api/videos/ez2ESYyRjRs?v=2&alt=json */
 
 //chrome.runtime.onMessage.addListener(function(req, sender) {
 //    console.log(req);

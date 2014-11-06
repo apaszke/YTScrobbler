@@ -16,6 +16,6 @@
       "scripts": ["js/bg.js"]
   },
   "permissions": [
-    "storage", "tabs", "<all_urls>", "notifications"
+    "storage", "tabs", "<all_urls>", "notifications", "webNavigation"
   ]
 }
